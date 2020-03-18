@@ -31,6 +31,7 @@ class CreditController extends Controller
                 'starting_after' => $startingAfter
             ]);
         } catch (\Exception $e) {
+            \Bugsnag::notifyException($e);
             throw new ApiException('Failed to get charges list. Please contact the support team.', 400);
         }
 
@@ -82,6 +83,7 @@ class CreditController extends Controller
 
             });
         } catch (\Exception $e) {
+            \Bugsnag::notifyException($e);
             throw new ApiException('Failed to buy credits. Please contact the support team.', 400);
         }
 

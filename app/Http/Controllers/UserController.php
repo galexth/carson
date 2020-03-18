@@ -19,7 +19,10 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::with(['tasks'])->findOrFail($id);
-        $user->append(['last_purchases']);
+
+        if ($user->stripe_id) {
+            $user->append(['last_purchases']);
+        }
 
         return response($user);
     }
@@ -78,25 +81,30 @@ class UserController extends Controller
         }
 
         if (! $user->stripe_id) {
-            \DB::transaction(function () use ($user) {
-                $customer = Customer::create([
-                    'email' => $user->email,
-                ]);
+            try {
+                \DB::transaction(function () use ($user) {
+                    $customer = Customer::create([
+                        'email' => $user->email,
+                    ]);
 
-                $paymentMethod = PaymentMethod::retrieve(
-                    'pm_card_visa'
-                );
+                    $paymentMethod = PaymentMethod::retrieve(
+                        'pm_card_visa'
+                    );
 
-                $paymentMethod->attach([
-                    'customer' => $customer->id,
-                ]);
+                    $paymentMethod->attach([
+                        'customer' => $customer->id,
+                    ]);
 
-                $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
-                $customer->save();
+                    $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
+                    $customer->save();
 
-                $user->stripe_id = $customer->id;
-                $user->save();
-            });
+                    $user->stripe_id = $customer->id;
+                    $user->save();
+                });
+            } catch (\Exception $e) {
+                \Bugsnag::notifyException($e);
+                throw new ApiException($e->getMessage(), 400);
+            }
         }
 
         $user->approve();

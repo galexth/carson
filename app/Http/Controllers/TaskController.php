@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
-use App\Task;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
 

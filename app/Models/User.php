@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Task;
+use App\Exceptions\ApiException;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -126,13 +126,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @param array $options
      *
      * @return \Stripe\Collection
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws \App\Exceptions\ApiException
      */
     public function charges(array $options = [])
     {
-        return Charge::all(array_merge([
-            'customer' => $this->stripe_id,
-        ], $options));
+        try {
+            return Charge::all(array_merge([
+                'customer' => $this->stripe_id,
+            ], $options));
+        } catch (\Exception $e) {
+            \Bugsnag::notifyException($e);
+            throw new ApiException($e->getMessage(), 400);
+        }
     }
 
     /**
