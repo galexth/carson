@@ -46,9 +46,12 @@ class TaskController extends Controller
             throw new ApiException('Not enough credit.', 422);
         }
 
-        $task = \DB::transaction(function () use ($request) {
+        $task = new Task($request->all());
+        $task->user_id = \Auth::id();
+
+        \DB::transaction(function () use ($request, $task) {
             \Auth::user()->decrement('credits');
-            return Task::create($request->all());
+            $task->save();
         });
 
         return response($task, 201);

@@ -47,6 +47,12 @@ return [
             'level' => 'debug',
         ],
 
+        'stripe' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/stripe.log'),
+            'level' => 'debug',
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/lumen.log'),

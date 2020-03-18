@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'common'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,43 +33,15 @@ return [
 
     'connections' => [
 
-        'common' => [
+        'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'id'),
-            'username' => env('DB_USERNAME', 'user'),
-            'password' => env('DB_PASSWORD', '123'),
+            'database' => env('DB_DATABASE', 'carson'),
+            'username' => env('DB_USERNAME', 'homestead'),
+            'password' => env('DB_PASSWORD', 'secret'),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'url' => env('DATABASE_URL'),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'prefix_indexes' => true,
-            'prefix' => '',
-            'strict' => true,
-            'engine' => 'InnoDB',
-            'modes' => [
-                'ONLY_FULL_GROUP_BY',
-                'STRICT_TRANS_TABLES',
-                'NO_ZERO_IN_DATE',
-                'NO_ZERO_DATE',
-                'ERROR_FOR_DIVISION_BY_ZERO',
-                'NO_AUTO_CREATE_USER',
-                'NO_ENGINE_SUBSTITUTION',
-            ],
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
-        'leads' => [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE_LEADS', 'leads'),
-            'username' => env('DB_USERNAME', 'user'),
-            'password' => env('DB_PASSWORD', '123'),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
             'url' => env('DATABASE_URL'),
             'unix_socket' => env('DB_SOCKET', ''),
             'prefix_indexes' => true,
@@ -103,44 +75,5 @@ return [
     */
 
     'migrations' => 'migrations',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Redis Databases
-    |--------------------------------------------------------------------------
-    |
-    | Redis is an open source, fast, and advanced key-value store that also
-    | provides a richer body of commands than a typical key-value system
-    | such as APC or Memcached. Laravel makes it easy to dig right in.
-    |
-    */
-
-    'redis' => [
-
-        'client' => env('REDIS_CLIENT', 'phpredis'),
-
-        'options' => [
-            'cluster' => env('REDIS_CLUSTER', 'redis'),
-        ],
-
-        'default' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', 6379),
-            'database' => env('REDIS_DB', 0),
-            'prefix' => env('REDIS_PREFIX', 'service_id_'),
-        ],
-
-        'shared' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', 6379),
-            'database' => 1,
-            'prefix' => 'shared_',
-        ],
-
-    ],
 
 ];

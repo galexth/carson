@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Exceptions\ApiException;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
-use Stripe\Charge;
+use Stripe\Customer;
+use Stripe\PaymentIntent;
 
 class CreditController extends Controller
 {
@@ -17,7 +18,7 @@ class CreditController extends Controller
      */
     public function index(Request $request)
     {
-        $startingAfter = (int) $request->input('starting_after');
+        $startingAfter = $request->input('starting_after');
         $limit = (int) $request->input('limit') ?: 10;
 
         if ($limit > 100) {
@@ -30,7 +31,7 @@ class CreditController extends Controller
                 'starting_after' => $startingAfter
             ]);
         } catch (\Exception $e) {
-            throw new ApiException('Failed to buy credits. Please contact the support team.', 400);
+            throw new ApiException('Failed to get charges list. Please contact the support team.', 400);
         }
 
         return response($charges);
@@ -56,17 +57,29 @@ class CreditController extends Controller
         try {
             \DB::transaction(function () use ($creditPrice, $credits) {
                 \Auth::user()->increment('credits', $credits);
-                Charge::create([
-                    // amount in cents
+
+                $customer = Customer::retrieve(\Auth::user()->stripe_id);
+
+                $paymentIntent = PaymentIntent::create([
                     'amount' => $credits * $creditPrice * 100,
                     'currency' => 'usd',
                     'customer' => \Auth::user()->stripe_id,
-                    'description' => 'Credit charge',
+                    'payment_method' => $customer->invoice_settings['default_payment_method'],
+                    'confirmation_method' => 'automatic',
+                    'confirm' => true,
                     'metadata' => [
                         'credits' => $credits,
                         'price' => $creditPrice
                     ]
                 ]);
+
+                if (in_array($paymentIntent->status, [
+                    PaymentIntent::STATUS_REQUIRES_ACTION,
+                    PaymentIntent::STATUS_REQUIRES_PAYMENT_METHOD
+                ])) {
+                    throw new ApiException('Payment failed. Please contact the support team.', 400);
+                }
+
             });
         } catch (\Exception $e) {
             throw new ApiException('Failed to buy credits. Please contact the support team.', 400);

@@ -34,6 +34,7 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|confirmed|min:8',
             'name' => 'required|max:255',
+            'address' => 'max:255',
         ]);
     }
 
@@ -47,8 +48,9 @@ class RegisterController extends Controller
         /** @var User $user */
         $user = new User();
         $user->name = $data['name'];
-        $user->email = $data['email'];
+        $user->email = strtolower($data['email']);
         $user->password = app('hash')->make($data['password']);
+        $user->address = $data['address'] ?? null;
         $user->status = User::STATUS_PENDING;
         $user->role = User::ROLE_USER;
         $user->save();

@@ -36,10 +36,6 @@ class Authenticate
      */
     public function handle($request, Closure $next)
     {
-        if (app()->environment() == 'testing') {
-            return $next($request);
-        }
-
         $this->auth->parser()->setRequest($request);
 
         try {

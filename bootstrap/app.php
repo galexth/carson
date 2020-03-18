@@ -94,6 +94,7 @@ $app->configure('filesystems');
 $app->routeMiddleware([
     'auth' => \App\Http\Middleware\Authenticate::class,
     'admin' => \App\Http\Middleware\Admin::class,
+    'approved' => \App\Http\Middleware\Approved::class,
 ]);
 
 /*
@@ -113,6 +114,7 @@ if ($app->environment() !== 'production') {
 
 $app->register(\App\Providers\AppServiceProvider::class);
 $app->register(Bugsnag\BugsnagLaravel\BugsnagServiceProvider::class);
+$app->register(\Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

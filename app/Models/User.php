@@ -9,10 +9,12 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Stripe\Charge;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Class User
  * @property string                                        $name
+ * @property string                                        $address
  * @property string                                        $email
  * @property string                                        $password
  * @property string                                        $status
@@ -25,12 +27,12 @@ use Stripe\Charge;
  *
  * @mixin \Eloquent
  */
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable;
 
     public const STATUS_PENDING = 'pending';
-    public const STATUS_ACTIVE = 'active';
+    public const STATUS_APPROVED = 'approved';
     public const STATUS_BANNED = 'banned';
 
     public const ROLE_USER = 'user';
@@ -53,11 +55,31 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     /**
+     * Get the identifier that will be stored in the subject claim of the JWT
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    /**
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function getLastPurchasesAttribute()
     {
-        $this->charges(['limit' => 10]);
+        return $this->charges(['limit' => 10])->data;
     }
 
     /**
@@ -82,6 +104,22 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function isAdmin()
     {
         return $this->role == static::ROLE_ADMIN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isApproved()
+    {
+        return $this->status == static::STATUS_APPROVED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBanned()
+    {
+        return $this->status == static::STATUS_BANNED;
     }
 
     /**
@@ -112,7 +150,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function approve()
     {
-        $this->status = static::STATUS_ACTIVE;
+        $this->status = static::STATUS_APPROVED;
 
         return $this->save();
     }

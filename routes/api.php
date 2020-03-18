@@ -18,11 +18,13 @@ $router->post('/auth/refresh', ['middleware' => ['jwt.check'], 'uses' => 'LoginC
 
 $router->group(['middleware' => ['auth']], function (\Laravel\Lumen\Routing\Router $router) {
 
-    $router->post('/tasks', 'TaskController@store');
-    $router->get('/tasks', 'TaskController@index');
+    $router->group(['middleware' => ['approved']], function (\Laravel\Lumen\Routing\Router $router) {
+        $router->post('/tasks', 'TaskController@store');
+        $router->get('/tasks', 'TaskController@index');
 
-    $router->get('/credits', 'CreditController@index');
-    $router->post('/credits/buy', 'CreditController@buy');
+        $router->get('/credits', 'CreditController@index');
+        $router->post('/credits/buy', 'CreditController@buy');
+    });
 
     $router->group(['middleware' => ['admin']], function (\Laravel\Lumen\Routing\Router $router) {
         $router->get('/admin/users/pending', 'UserController@pending');

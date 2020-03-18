@@ -13,6 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        \Stripe\Stripe::setApiKey(config('services.stripe.key'));
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        \Stripe\Stripe::setLogger(\Log::channel('stripe'));
     }
 }
