@@ -11,6 +11,23 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+/** @var \Laravel\Lumen\Routing\Router $router */
+$router->post('/auth/sign-in', 'LoginController@signIn');
+$router->post('/auth/sign-up', 'RegisterController@signUp');
+$router->post('/auth/refresh', ['middleware' => ['jwt.check'], 'uses' => 'LoginController@refresh']);
+
+$router->group(['middleware' => ['auth']], function (\Laravel\Lumen\Routing\Router $router) {
+
+    $router->post('/tasks', 'TaskController@store');
+    $router->get('/tasks', 'TaskController@index');
+
+    $router->get('/credits', 'CreditController@index');
+    $router->post('/credits/buy', 'CreditController@buy');
+
+    $router->group(['middleware' => ['admin']], function (\Laravel\Lumen\Routing\Router $router) {
+        $router->get('/admin/users/pending', 'UserController@pending');
+        $router->get('/admin/users/{id}', 'UserController@show');
+        $router->put('/admin/users/{id}/ban', 'UserController@ban');
+        $router->put('/admin/users/{id}/approve', 'UserController@approve');
+    });
 });

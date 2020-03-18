@@ -50,6 +50,7 @@ class RegisterController extends Controller
         $user->email = $data['email'];
         $user->password = app('hash')->make($data['password']);
         $user->status = User::STATUS_PENDING;
+        $user->role = User::ROLE_USER;
         $user->save();
 
         return $user;

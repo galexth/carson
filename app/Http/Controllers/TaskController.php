@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiException;
 use App\Task;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
@@ -30,7 +31,7 @@ class TaskController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \App\Exceptions\ApiException
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
@@ -41,10 +42,12 @@ class TaskController extends Controller
             'category' => 'string|max:255',
         ]);
 
-        $this->authorize('store', Task::class);
+        if (! \Auth::user()->hasCredits()) {
+            throw new ApiException('Not enough credit.', 422);
+        }
 
         $task = \DB::transaction(function () use ($request) {
-            \Auth::user()->decrement('credit');
+            \Auth::user()->decrement('credits');
             return Task::create($request->all());
         });
 

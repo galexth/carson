@@ -20,7 +20,9 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('stripe_id')->nullable()->unique();
             $table->string('status')->index();
-            $table->unsignedInteger('credit')->default(0);
+            $table->string('role')->index();
+            $table->string('address')->nullable();
+            $table->unsignedInteger('credits')->default(0);
             $table->timestamps();
         });
     }
