@@ -45,7 +45,7 @@ class CreditControllerTest extends TestCase
         /**
          * @see \App\Http\Controllers\CreditController::index()
          */
-        $response = $this->get('/credits', [
+        $response = $this->get('/credits/history', [
             'Authorization' => $this->getAuthorizationHeader($user)
         ]);
         $response->seeJsonStructure([

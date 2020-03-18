@@ -22,7 +22,7 @@ $router->group(['middleware' => ['auth']], function (\Laravel\Lumen\Routing\Rout
         $router->post('/tasks', 'TaskController@store');
         $router->get('/tasks', 'TaskController@index');
 
-        $router->get('/credits', 'CreditController@index');
+        $router->get('/credits/history', 'CreditController@index');
         $router->post('/credits/buy', 'CreditController@buy');
     });
 
